@@ -34,15 +34,13 @@ async function loadData() {
     }
 }
 
-// Get dates starting from today going forward (for next 30 days)
-function getNext30Days() {
-    const dates = [];
-    for (let i = 0; i < 30; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() + i);
-        dates.push(d.toISOString().split('T')[0]);
-    }
-    return dates;
+// Get only the dates we actually have stats for (no future projection)
+function getAvailableDates() {
+    if (!window.dailyStats) return [];
+    const today = new Date().toISOString().split('T')[0];
+    return Object.keys(window.dailyStats)
+        .filter(d => d <= today)
+        .sort();
 }
 
 // Render the cumulative problems graph
@@ -53,7 +51,11 @@ async function renderGraph() {
         return;
     }
 
-    const dates = getNext30Days();
+    const dates = getAvailableDates();
+    if (!dates.length) {
+        console.warn('No daily stats available to plot');
+        return;
+    }
     const comicColors = ['#FF006E', '#00D9FF', '#FFBE0B', '#FF8C00'];
 
     const datasets = window.users.map((user, idx) => {
