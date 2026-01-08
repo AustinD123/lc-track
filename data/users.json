@@ -1,22 +1,18 @@
 [
   {
     "leetcode_username": "austin",
-    "display_name": "Austin",
+    "display_name": "austind090305",
     "color": "#FF006E"
   },
   {
-    "leetcode_username": "rahul",
-    "display_name": "Rahul",
+    "leetcode_username": "vivek",
+    "display_name": "VivekSappadla",
     "color": "#00D9FF"
   },
   {
-    "leetcode_username": "alex",
+    "leetcode_username": "Vehan",
     "display_name": "Alex",
     "color": "#FFBE0B"
-  },
-  {
-    "leetcode_username": "jordan",
-    "display_name": "Jordan",
-    "color": "#8338EC"
   }
+  
 ]

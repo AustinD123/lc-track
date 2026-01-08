@@ -1,58 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚔️ LeetCode Daily Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="stars"></div>
-    
     <div class="container">
         <!-- Header -->
         <div class="header">
             <div class="title-wrapper">
-                <h1 class="title">LEETCODE</h1>
-                <h2 class="subtitle">DAILY TRACKER</h2>
+                <h1 class="title">LEETCODE DAILY TRACKER</h1>
             </div>
             <div class="date-display" id="dateDisplay"></div>
         </div>
 
-        <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="graph">📊 GRAPH</button>
-            <button class="tab-btn" data-tab="leaderboard">🏆 LEADERBOARD</button>
-            <button class="tab-btn" data-tab="streaks">🔥 STREAKS</button>
-        </div>
-
-        <!-- Graph Tab -->
-        <div id="graph" class="tab-content active">
+        <!-- Graph -->
+        <section class="graph-section">
             <div class="graph-container">
                 <canvas id="problemsChart"></canvas>
             </div>
-            <div class="legend" id="legend"></div>
-        </div>
+        </section>
 
-        <!-- Leaderboard Tab -->
-        <div id="leaderboard" class="tab-content">
+        <!-- Leaderboard -->
+        <section class="leaderboard-section">
             <div class="vs-screen">
                 <div class="leaderboard-header">
-                    <h3>🎮 TODAY'S RANKING 🎮</h3>
+                    <h3>TODAY'S RANKING</h3>
                 </div>
                 <div id="leaderboardList" class="leaderboard-list"></div>
-                <div class="leaderboard-footer">
-                    <p>💾 PROBLEMS SOLVED TODAY</p>
-                </div>
             </div>
-        </div>
-
-        <!-- Streaks Tab -->
-        <div id="streaks" class="tab-content">
-            <div class="streaks-container">
-                <h3>🔥 CURRENT STREAKS 🔥</h3>
-                <div id="streaksList" class="streaks-list"></div>
+        </section>
+    </div>
             </div>
         </div>
 

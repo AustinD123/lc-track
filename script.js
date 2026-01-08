@@ -1,5 +1,5 @@
 let chart = null;
-let streakData = {};
+let streakData = {}; // (Removed streak data)
 
 // Configuration
 const CONFIG = {
@@ -9,18 +9,16 @@ const CONFIG = {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
     setDateDisplay();
-    await loadData();
-    initializeTabs();
     await renderGraph();
     await renderLeaderboard();
-    await renderStreaks();
 });
+    await loadData(); // (Removed streaks and tabs)
 
 // Set current date display
 function setDateDisplay() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const today = new Date().toLocaleDateString('en-US', options);
-    document.getElementById('dateDisplay').textContent = `📅 ${today}`;
+    document.getElementById('dateDisplay').textContent = today; // (Removed emoji)
 }
 
 // Load all data
@@ -29,53 +27,27 @@ async function loadData() {
         const usersRes = await fetch('./data/users.json');
         const dailyStatsRes = await fetch('./data/daily_stats.json');
         
+        const cacheBust = `?t=${Date.now()}`;
+        const usersRes = await fetch(`./data/users.json${cacheBust}`, { cache: 'no-store' });
+        const dailyStatsRes = await fetch(`./data/daily_stats.json${cacheBust}`, { cache: 'no-store' });
+
         if (!usersRes.ok || !dailyStatsRes.ok) {
             console.error('Failed to load data files');
             return;
         }
-        
+
         window.users = await usersRes.json();
         window.dailyStats = await dailyStatsRes.json();
-        
-        // Update last update time
-        updateLastUpdateTime();
     } catch (error) {
         console.error('Error loading data:', error);
     }
 }
 
 // Update last update timestamp
-function updateLastUpdateTime() {
-    const lastUpdate = localStorage.getItem('lastUpdate') || new Date().toLocaleString();
-    document.getElementById('lastUpdate').textContent = lastUpdate;
-}
+// (Removed last update UI)
 
 // Initialize tab switching
-function initializeTabs() {
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tabName = button.getAttribute('data-tab');
-
-            // Remove active class from all buttons and contents
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabContents.forEach(content => content.classList.remove('active'));
-
-            // Add active class to clicked button and corresponding content
-            button.classList.add('active');
-            document.getElementById(tabName).classList.add('active');
-
-            // Trigger animations
-            if (tabName === 'graph') {
-                setTimeout(() => {
-                    if (chart) chart.resize();
-                }, 400);
-            }
-        });
-    });
-}
+// (Removed tabs)
 
 // Render the daily problems graph
 async function renderGraph() {
@@ -85,7 +57,7 @@ async function renderGraph() {
     // Prepare data for the last 30 days
     const dates = getLast30Days();
     const datasets = [];
-    const colors = {};
+    const datasets = []; // (Removed colors)
 
     // Build datasets for each user
     window.users.forEach(user => {
@@ -93,21 +65,22 @@ async function renderGraph() {
             return window.dailyStats[date]?.[user.leetcode_username] || 0;
         });
 
-        colors[user.display_name] = user.color;
         datasets.push({
             label: user.display_name,
             data: data,
-            borderColor: user.color,
-            backgroundColor: user.color + '33',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 5,
-            pointBackgroundColor: user.color,
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointHoverRadius: 7,
-            pointHoverBackgroundColor: user.color,
+            borderColor: '#000', // (Changed to black)
+            backgroundColor: '#000', // (Changed to black)
+            borderWidth: 2, // (Changed width)
+            fill: false, // (Changed fill)
+            tension: 0, // (Changed tension)
+            pointRadius: 4, // (Changed radius)
+            pointStyle: 'circle', // (Changed point style)
+            borderDash: [], // (Removed point styles)
+            pointBackgroundColor: '#000', // (Changed to black)
+            pointBorderColor: '#fff', // (Kept white)
+            pointBorderWidth: 1, // (Kept width)
+            pointHoverRadius: 5, // (Kept hover radius)
+            pointHoverBackgroundColor: '#000', // (Changed to black)
         });
     });
 
@@ -126,22 +99,18 @@ async function renderGraph() {
         options: {
             responsive: true,
             maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: false
-                },
+                legend: { display: false },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleFont: { size: 14, weight: 'bold' },
+                    backgroundColor: 'rgba(0, 0, 0, 0.85)', // (Changed color)
+                    titleFont: { size: 12, weight: 'bold' }, // (Changed size)
                     bodyFont: { size: 12 },
-                    padding: 15,
-                    displayColors: true,
+                    padding: 10, // (Changed padding)
+                    displayColors: false, // (Removed colors)
                     callbacks: {
-                        label: function(context) {
-                            return context.dataset.label + ': ' + context.parsed.y + ' problems';
-                        }
+                        label: (context) => `${context.dataset.label}: ${context.parsed.y}` // (Changed to arrow function)
                     }
                 }
+            },
             },
             scales: {
                 y: {
@@ -166,8 +135,7 @@ async function renderGraph() {
             }
         }
     });
-
-    // Render legend
+    // Legend removed
     renderLegend(colors);
 }
 
@@ -193,15 +161,12 @@ function renderLegend(colors) {
         item.innerHTML = `
             <div class="legend-color" style="background-color: ${color};"></div>
             <span>${name}</span>
-        `;
-        legendContainer.appendChild(item);
     });
 }
 
 // Render leaderboard
 async function renderLeaderboard() {
-    const leaderboardList = document.getElementById('leaderboardList');
-    leaderboardList.innerHTML = '';
+        const badge = `#${rank}`; // (Removed badges)
 
     const today = new Date().toISOString().split('T')[0];
     const todayStats = window.dailyStats[today] || {};
@@ -210,7 +175,6 @@ async function renderLeaderboard() {
     const rankings = window.users.map(user => ({
         ...user,
         solved: todayStats[user.leetcode_username] || 0,
-        streak: calculateStreak(user.leetcode_username),
         maxStreak: calculateMaxStreak(user.leetcode_username)
     })).sort((a, b) => b.solved - a.solved);
 
@@ -226,68 +190,13 @@ async function renderLeaderboard() {
         item.innerHTML = `
             <div class="rank-badge">${badge}</div>
             <div class="rank-info">
-                <div class="rank-name">${user.display_name}</div>
-                <div class="rank-stats">Streak: ${user.streak} 🔥 | Max: ${user.maxStreak}</div>
-            </div>
-            <div class="rank-score">${user.solved}</div>
-        `;
-
-        // Check for level-up and apply animation
-        const previousRank = getPreviousRank(user.leetcode_username);
-        if (previousRank && previousRank > rank) {
-            item.classList.add('level-up');
-        }
-
-        leaderboardList.appendChild(item);
-    });
-}
-
-// Render streaks
-async function renderStreaks() {
-    const streaksList = document.getElementById('streaksList');
-    streaksList.innerHTML = '';
-
-    window.users.forEach(user => {
+// Streaks removed
         const currentStreak = calculateStreak(user.leetcode_username);
         const maxStreak = calculateMaxStreak(user.leetcode_username);
-        const isBroken = currentStreak === 0;
-
-        const card = document.createElement('div');
-        card.className = `streak-card ${isBroken ? 'broken' : ''}`;
-        card.innerHTML = `
-            <div class="streak-icon">${isBroken ? '💀' : '🔥'}</div>
-            <div class="streak-name">${user.display_name}</div>
-            <div class="streak-count">${currentStreak}</div>
-            <div class="streak-label">${isBroken ? 'STREAK BROKEN' : 'DAYS IN A ROW'}</div>
-            <div class="max-streak">🏆 Max Streak: ${maxStreak}</div>
-        `;
-
-        streaksList.appendChild(card);
-    });
-}
-
-// Calculate current streak
-function calculateStreak(username) {
-    let streak = 0;
+// Streak calculation removed
     const today = new Date();
 
-    for (let i = 0; i < 365; i++) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-
-        const solved = window.dailyStats[dateStr]?.[username] || 0;
-        if (solved > 0) {
-            streak++;
-        } else if (i > 0) {
-            break;
-        }
-    }
-
-    return streak;
-}
-
-// Calculate maximum streak ever
+// Max streak removed
 function calculateMaxStreak(username) {
     let maxStreak = 0;
     let currentStreak = 0;
@@ -321,17 +230,12 @@ function savePreviousRanks() {
         .map((user, index) => ({
             username: user.leetcode_username,
             rank: index + 1,
-            solved: todayStats[user.leetcode_username] || 0
+    // await renderStreaks(); // (Removed streaks)
         }))
         .sort((a, b) => b.solved - a.solved);
 
     const rankMap = {};
-    rankings.forEach(r => {
-        rankMap[r.username] = r.rank;
-    });
-
-    localStorage.setItem('previousRanks', JSON.stringify(rankMap));
-}
+// Screen shake removed
 
 // Auto-refresh data every 5 minutes
 setInterval(async () => {
@@ -340,6 +244,7 @@ setInterval(async () => {
     await renderLeaderboard();
     await renderStreaks();
     applyScreenShake();
+// (Removed resize check for active graph)
 }, 5 * 60 * 1000);
 
 // Apply screen shake effect
