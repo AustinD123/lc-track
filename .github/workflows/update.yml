@@ -1,9 +1,9 @@
-name: Update LeetCode Stats Daily
+name: Update LeetCode Stats
 
 on:
   schedule:
-    # Runs daily at 12:05 AM IST (6:35 PM UTC previous day)
-    - cron: '35 18 * * *'
+    # Runs every 5 minutes
+    - cron: '*/5 * * * *'
   
   # Allow manual trigger
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📊 Update LeetCode stats - $(date +'%Y-%m-%d')"
+            git commit -m "📊 Update LeetCode stats - $(date +'%Y-%m-%d %H:%M:%S')"
             git push origin main
           fi
       
