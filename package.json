@@ -1,0 +1,21 @@
+{
+  "name": "leetcode-daily-tracker",
+  "version": "1.0.0",
+  "description": "A daily-updating LeetCode progress tracker with Scott Pilgrim vibe",
+  "main": "scripts/update-stats.js",
+  "scripts": {
+    "update": "node scripts/update-stats.js",
+    "dev": "python -m http.server 8000"
+  },
+  "keywords": [
+    "leetcode",
+    "tracker",
+    "daily",
+    "github-pages",
+    "arcade",
+    "scott-pilgrim"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}

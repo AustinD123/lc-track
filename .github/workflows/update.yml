@@ -1,0 +1,53 @@
+name: Update LeetCode Stats Daily
+
+on:
+  schedule:
+    # Runs daily at 12:05 AM IST (6:35 PM UTC previous day)
+    - cron: '35 18 * * *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Fetch LeetCode data
+        run: node scripts/update-stats.js
+      
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "LeetCode Tracker Bot"
+          git config --global user.email "bot@leetcodetracker.com"
+          
+          git add data/daily_stats.json
+          
+          # Only commit if there are changes
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📊 Update LeetCode stats - $(date +'%Y-%m-%d')"
+            git push origin main
+          fi
+      
+      - name: Create GitHub Pages deployment
+        uses: actions/upload-artifact@v3
+        with:
+          name: github-pages
+          path: |
+            index.html
+            style.css
+            script.js
+            data/
