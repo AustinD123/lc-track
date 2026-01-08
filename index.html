@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LeetCode Daily Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Comic+Neue:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Bangers&family=Comic+Neue:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,14 +13,16 @@
         <div class="header">
             <div class="title-wrapper">
                 <h1 class="title">LEETCODE DAILY TRACKER</h1>
+                <div class="date-display" id="dateDisplay"></div>
             </div>
-            <div class="date-display" id="dateDisplay"></div>
         </div>
 
         <!-- Graph -->
         <section class="graph-section">
             <div class="graph-container">
-                <canvas id="problemsChart"></canvas>
+                <div style="position: relative; height: 350px;">
+                    <canvas id="problemsChart"></canvas>
+                </div>
             </div>
         </section>
 

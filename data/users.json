@@ -1,18 +1,20 @@
 [
   {
-    "leetcode_username": "austin",
-    "display_name": "austind090305",
-    "color": "#FF006E"
+    "leetcode_username": "austind090305",
+    "display_name": "austin",
+    "color": "#FF006E",
+    "totalSolved": 256
   },
   {
-    "leetcode_username": "vivek",
-    "display_name": "VivekSappadla",
-    "color": "#00D9FF"
+    "leetcode_username": "VivekSappadla",
+    "display_name": "vivek",
+    "color": "#00D9FF",
+    "totalSolved": 232
   },
   {
-    "leetcode_username": "Vehan",
-    "display_name": "vehan_rj",
-    "color": "#FFBE0B"
+    "leetcode_username": "vehan_rj",
+    "display_name": "vehan",
+    "color": "#FFBE0B",
+    "totalSolved": 30
   }
-  
 ]

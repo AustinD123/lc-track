@@ -2,16 +2,15 @@ let chart = null;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
-    setDateDisplay();
     await loadData();
     await renderGraph();
     await renderLeaderboard();
+    updateDate();
 });
 
-// Set current date display
-function setDateDisplay() {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const today = new Date().toLocaleDateString('en-US', options);
+// Update date display
+function updateDate() {
+    const today = new Date().toISOString().split('T')[0];
     document.getElementById('dateDisplay').textContent = today;
 }
 
@@ -29,44 +28,61 @@ async function loadData() {
 
         window.users = await usersRes.json();
         window.dailyStats = await dailyStatsRes.json();
+        console.log('Data loaded:', window.users, window.dailyStats);
     } catch (error) {
         console.error('Error loading data:', error);
     }
 }
 
-// Render the daily problems graph
+// Get dates starting from today going forward (for next 30 days)
+function getNext30Days() {
+    const dates = [];
+    for (let i = 0; i < 30; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        dates.push(d.toISOString().split('T')[0]);
+    }
+    return dates;
+}
+
+// Render the cumulative problems graph
 async function renderGraph() {
     const ctx = document.getElementById('problemsChart')?.getContext('2d');
-    if (!ctx || !window.users || !window.dailyStats) return;
+    if (!ctx || !window.users || !window.dailyStats) {
+        console.error('Missing chart context or data');
+        return;
+    }
 
-    const dates = getLast30Days();
-    const styles = [
-        { dash: [], point: 'circle' },
-        { dash: [6, 4], point: 'rect' },
-        { dash: [2, 2], point: 'triangle' },
-        { dash: [10, 5], point: 'star' },
-        { dash: [1, 4], point: 'cross' }
-    ];
+    const dates = getNext30Days();
+    const comicColors = ['#FF006E', '#00D9FF', '#FFBE0B', '#FF8C00'];
 
     const datasets = window.users.map((user, idx) => {
-        const data = dates.map(d => (window.dailyStats[d]?.[user.leetcode_username] || 0));
-        const style = styles[idx % styles.length];
+        // Start from current total
+        const currentTotal = user.totalSolved || 0;
+        let cumulative = currentTotal;
+        
+        const data = dates.map(d => {
+            const daily = window.dailyStats[d]?.[user.leetcode_username] || 0;
+            cumulative += daily;
+            return cumulative;
+        });
+        
+        const color = comicColors[idx % comicColors.length];
         return {
             label: user.display_name,
             data,
-            borderColor: '#000',
-            backgroundColor: '#000',
-            borderWidth: 2,
+            borderColor: color,
+            backgroundColor: 'transparent',
+            borderWidth: 5,
             fill: false,
-            tension: 0,
-            pointRadius: 4,
-            pointStyle: style.point,
-            borderDash: style.dash,
-            pointBackgroundColor: '#000',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 1,
-            pointHoverRadius: 5,
-            pointHoverBackgroundColor: '#000',
+            tension: 0.2,
+            pointRadius: 6,
+            pointStyle: 'circle',
+            pointBackgroundColor: color,
+            pointBorderColor: '#000',
+            pointBorderWidth: 3,
+            pointHoverRadius: 8,
+            pointHoverBackgroundColor: color,
         };
     });
 
@@ -79,45 +95,54 @@ async function renderGraph() {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: { display: false },
+                legend: { 
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: { size: 14, weight: 'bold', family: 'Comic Neue' },
+                        padding: 15,
+                        boxWidth: 40,
+                        boxHeight: 4
+                    }
+                },
                 tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.85)',
-                    titleFont: { size: 12, weight: 'bold' },
-                    bodyFont: { size: 12 },
-                    padding: 10,
-                    displayColors: false,
+                    backgroundColor: '#000',
+                    titleFont: { size: 14, weight: 'bold', family: 'Permanent Marker' },
+                    bodyFont: { size: 13, family: 'Permanent Marker' },
+                    padding: 12,
+                    displayColors: true,
+                    borderColor: '#000',
+                    borderWidth: 3,
                     callbacks: {
-                        label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y}`
+                        title: (items) => `Date: ${items[0].label}`,
+                        label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y} problems`
                     }
                 }
             },
             scales: {
                 y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1, font: { size: 12, weight: 'bold' } },
-                    grid: { color: 'rgba(0,0,0,0.1)', lineWidth: 2 }
+                    beginAtZero: false,
+                    ticks: { 
+                        font: { size: 13, weight: 'bold', family: 'Permanent Marker' },
+                        color: '#000'
+                    },
+                    grid: { color: '#ddd', lineWidth: 2 },
+                    border: { color: '#000', width: 3 }
                 },
                 x: {
-                    ticks: { font: { size: 10 } },
-                    grid: { display: false }
+                    display: true,
+                    ticks: { 
+                        display: false
+                    },
+                    grid: { display: false },
+                    border: { color: '#000', width: 3 }
                 }
             }
         }
     });
 }
 
-// Get last 30 days in YYYY-MM-DD format
-function getLast30Days() {
-    const dates = [];
-    for (let i = 29; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        dates.push(d.toISOString().split('T')[0]);
-    }
-    return dates;
-}
-
-// Render leaderboard (today only)
+// Render leaderboard (today + total)
 async function renderLeaderboard() {
     const list = document.getElementById('leaderboardList');
     if (!list || !window.users || !window.dailyStats) return;
@@ -127,8 +152,12 @@ async function renderLeaderboard() {
     const todayStats = window.dailyStats[today] || {};
 
     const rankings = window.users
-        .map(u => ({ ...u, solved: todayStats[u.leetcode_username] || 0 }))
-        .sort((a, b) => b.solved - a.solved);
+        .map(u => ({ 
+            ...u, 
+            todaySolved: todayStats[u.leetcode_username] || 0,
+            totalSolved: u.totalSolved || 0
+        }))
+        .sort((a, b) => b.totalSolved - a.totalSolved);
 
     rankings.forEach((u, idx) => {
         const item = document.createElement('div');
@@ -137,8 +166,9 @@ async function renderLeaderboard() {
             <div class="rank-badge">#${idx + 1}</div>
             <div class="rank-info">
                 <div class="rank-name">${u.display_name}</div>
+                <div style="font-size: 0.9em; margin-top: 4px;">Today: +${u.todaySolved}</div>
             </div>
-            <div class="rank-score">${u.solved}</div>
+            <div class="rank-score">${u.totalSolved}</div>
         `;
         list.appendChild(item);
     });
