@@ -6,11 +6,13 @@ import os
 import time
 
 STATS_API = "https://leetcode-stats-api.herokuapp.com"
-GIST_ID = "https://gist.githubusercontent.com/AustinD123/2b5e58d33e6106d47671a043262cbaa9/raw/daily_stats.json"
+# Use the raw gist ID, not a URL
+GIST_ID = "2b5e58d33e6106d47671a043262cbaa9"
 GIST_TOKEN = os.environ["GIST_TOKEN"]
 
 HEADERS = {
-    "Authorization": f"Bearer {GIST_TOKEN}",
+    # GitHub API expects 'token' scheme for PATs
+    "Authorization": f"token {GIST_TOKEN}",
     "Accept": "application/vnd.github+json"
 }
 
@@ -22,9 +24,13 @@ def fetch_total(username):
 def load_gist():
     r = requests.get(
         f"https://api.github.com/gists/{GIST_ID}",
-        headers=HEADERS
+        headers=HEADERS,
+        timeout=10
     )
-    files = r.json()["files"]
+    data = r.json()
+    if "files" not in data:
+        raise RuntimeError(f"Unexpected Gist API response: {data}")
+    files = data["files"]
     return json.loads(files["daily_stats.json"]["content"])
 
 def save_gist(data):
