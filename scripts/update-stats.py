@@ -6,7 +6,7 @@ import os
 import time
 
 STATS_API = "https://leetcode-stats-api.herokuapp.com"
-GIST_ID = "https://gist.github.com/AustinD123/2b5e58d33e6106d47671a043262cbaa9"
+GIST_ID = "https://gist.githubusercontent.com/AustinD123/2b5e58d33e6106d47671a043262cbaa9/raw/daily_stats.json"
 GIST_TOKEN = os.environ["GIST_TOKEN"]
 
 HEADERS = {

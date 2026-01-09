@@ -16,13 +16,19 @@ function updateDate() {
 
 // Load data with cache-busting
 async function loadData() {
-    const GIST_URL = "https://gist.githubusercontent.com/USERNAME/GIST_ID/raw/daily_stats.json";
-    const res = await fetch(`${GIST_URL}?ts=${Date.now()}`);
-    window.dailyStats = await res.json();
+    const GIST_URL =
+      "https://gist.githubusercontent.com/AustinD123/2b5e58d33e6106d47671a043262cbaa9/raw/daily_stats.json";
+
+    const statsRes = await fetch(`${GIST_URL}?ts=${Date.now()}`);
+    window.dailyStats = await statsRes.json();
 
     const usersRes = await fetch(`./data/users.json?ts=${Date.now()}`);
     window.users = await usersRes.json();
+
+    console.log("STATS:", window.dailyStats);
+    console.log("USERS:", window.users);
 }
+
 
 
 // Get sorted available dates
